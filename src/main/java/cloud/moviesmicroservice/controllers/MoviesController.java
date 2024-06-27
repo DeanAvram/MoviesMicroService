@@ -1,6 +1,7 @@
 package cloud.moviesmicroservice.controllers;
 
 import cloud.moviesmicroservice.boundaries.MovieBoundary;
+import cloud.moviesmicroservice.exception.BadRequestException;
 import cloud.moviesmicroservice.services.MoviesService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -29,15 +30,14 @@ public class MoviesController {
     @GetMapping(
             produces = {MediaType.TEXT_EVENT_STREAM_VALUE}
     )
-    public Flux<MovieBoundary> getAllMovies() {
-        return moviesService.getAllMovies();
-    }
+    public Flux<MovieBoundary> getMovies(@RequestParam(value = "criteria", required = false) String criteria,
+                                         @RequestParam(value = "value", required = false) String value) {
+        if (criteria == null && value == null)
+            return this.moviesService.getAllMovies();
+        if (criteria != null && value != null)
+            return this.moviesService.getMoviesByCriteria(criteria, value);
+        throw new BadRequestException("Provide both criteria and value or none.");
 
-    @GetMapping(
-            produces = {MediaType.TEXT_EVENT_STREAM_VALUE}
-    )
-    public Flux<MovieBoundary> getMoviesByCriteria(String criteria, String value) {
-        return moviesService.getMoviesByCriteria(criteria, value);
     }
 
     @PutMapping(

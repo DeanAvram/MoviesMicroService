@@ -22,7 +22,7 @@ public class MoviesController {
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE}
     )
-    public Mono<MovieBoundary> createMovie(MovieBoundary movie) {
+    public Mono<MovieBoundary> createMovie(@RequestBody MovieBoundary movie) {
         return moviesService.createMovie(movie);
     }
 

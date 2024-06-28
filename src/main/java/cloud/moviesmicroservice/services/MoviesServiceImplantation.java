@@ -2,12 +2,14 @@ package cloud.moviesmicroservice.services;
 
 import cloud.moviesmicroservice.boundaries.MovieBoundary;
 import cloud.moviesmicroservice.entities.MovieEntity;
+import cloud.moviesmicroservice.exception.BadRequestException;
 import org.springframework.stereotype.Service;
+import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class MoviesServiceImplantation implements MoviesService{
+public class MoviesServiceImplantation implements MoviesService {
 
     private MoviesCrud movies;
 
@@ -15,9 +17,20 @@ public class MoviesServiceImplantation implements MoviesService{
         this.movies = movies;
     }
 
+
     @Override
     public Mono<MovieBoundary> createMovie(MovieBoundary movie) {
-        return null;
+        Mono<MovieEntity> entity = this.movies.findById(movie.getId());
+        return entity.hasElement()
+                .flatMap(
+                        exists -> {
+                            if (exists)
+                                return Mono.error(new BadRequestException("Movie with id: " + movie.getId() + " already exists"));
+                            return Mono.just(movie);
+                        })
+                .map(this::movieToEntity)
+                .flatMap(this.movies::save)
+                .map(this::movieToBoundary);
     }
 
     @Override
@@ -35,7 +48,21 @@ public class MoviesServiceImplantation implements MoviesService{
 
     @Override
     public Mono<Void> updateMovie(String id, String email, MovieBoundary movie) {
-        return null;
+        return this.movies.findById(id)
+                .flatMap(movieEntity -> {
+                    if (movie.getTitle() != null)
+                        movieEntity.setTitle(movie.getTitle());
+                    movieEntity.setYear(movie.getYear());
+                    if (movie.getGenres() != null)
+                        movieEntity.setGenres(movie.getGenres());
+                    if (movie.getLanguage() != null)
+                        movieEntity.setLanguage(movie.getLanguage());
+                    movieEntity.setLength(movie.getLength());
+                    if (movie.getDirector() != null)
+                        movieEntity.setDirector(movie.getDirector());
+                    return this.movies.save(movieEntity);
+                })
+                .then();
     }
 
     @Override
@@ -64,10 +91,14 @@ public class MoviesServiceImplantation implements MoviesService{
         return rv;
     }
 
-    private MovieEntity movieToEntity (MovieBoundary movieBoundary){
+    private MovieEntity movieToEntity(MovieBoundary movieBoundary) {
         MovieEntity rv = new MovieEntity();
 
+        if (movieBoundary.getId() == null)
+            throw new BadRequestException("Movie id cannot be null.");
         rv.setId(movieBoundary.getId());
+        if (movieBoundary.getTitle() == null)
+            throw new BadRequestException("Movie title cannot be null.");
         rv.setTitle(movieBoundary.getTitle());
         rv.setYear(movieBoundary.getYear());
         rv.setGenres(movieBoundary.getGenres());

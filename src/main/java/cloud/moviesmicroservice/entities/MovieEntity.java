@@ -1,8 +1,11 @@
 package cloud.moviesmicroservice.entities;
 
+import cloud.moviesmicroservice.exception.BadRequestException;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Year;
+import java.util.Date;
 import java.util.Set;
 
 @Document(collection = "MOVIES")
@@ -41,6 +44,9 @@ public class MovieEntity {
     }
 
     public void setYear(int year) {
+        if (year < 1800 || year > Year.now().getValue())
+            //assume there are no movies before 1800 and no movies from the future
+            throw new BadRequestException("Year must be a valid year.");
         this.year = year;
     }
 
@@ -65,6 +71,8 @@ public class MovieEntity {
     }
 
     public void setLength(int length) {
+        if (length < 0)
+            throw new BadRequestException("Length must be a positive number.");
         this.length = length;
     }
 

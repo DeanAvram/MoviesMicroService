@@ -43,7 +43,20 @@ public class MoviesServiceImplantation implements MoviesService {
 
     @Override
     public Flux<MovieBoundary> getMoviesByCriteria(String criteria, String value) {
-        return null;
+        Flux<MovieEntity> movies;
+        try {
+            movies = switch (criteria) {
+                case ("title") -> this.movies.findAllByTitleContainsIgnoreCase(value);
+                case ("genre") -> this.movies.findAllByGenresContainingIgnoreCase(value);
+                case ("maxLength") -> this.movies.findAllByLengthIsLessThan(Integer.parseInt(value));
+                case ("minLength") -> this.movies.findAllByLengthGreaterThan(Integer.parseInt(value));
+                default -> throw new BadRequestException("Invalid criteria: " + criteria);
+            };
+        }
+        catch (NumberFormatException e) {
+            throw new BadRequestException("Invalid value for criteria: " + criteria + ". Value must be an integer.");
+        }
+        return movies.map(this::movieToBoundary);
     }
 
     @Override
@@ -52,7 +65,8 @@ public class MoviesServiceImplantation implements MoviesService {
                 .flatMap(movieEntity -> {
                     if (movie.getTitle() != null)
                         movieEntity.setTitle(movie.getTitle());
-                    movieEntity.setYear(movie.getYear());
+                    if (movie.getYear() != 0)
+                        movieEntity.setYear(movie.getYear());
                     if (movie.getGenres() != null)
                         movieEntity.setGenres(movie.getGenres());
                     if (movie.getLanguage() != null)

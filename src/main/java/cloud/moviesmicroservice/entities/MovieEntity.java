@@ -71,7 +71,7 @@ public class MovieEntity {
     }
 
     public void setLength(int length) {
-        if (length < 0)
+        if (length <= 0)
             throw new BadRequestException("Length must be a positive number.");
         this.length = length;
     }

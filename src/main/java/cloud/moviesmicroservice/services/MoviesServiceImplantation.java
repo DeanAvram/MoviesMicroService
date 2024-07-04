@@ -45,6 +45,7 @@ public class MoviesServiceImplantation implements MoviesService {
         Flux<MovieEntity> movies;
         try {
             movies = switch (criteria) {
+                case("id") -> this.movies.findById(value).flux();
                 case ("title") -> this.movies.findAllByTitleContainsIgnoreCase(value);
                 case ("genre") -> this.movies.findAllByGenresContainingIgnoreCase(value);
                 case ("maxLength") -> this.movies.findAllByLengthIsLessThan(Integer.parseInt(value));

@@ -14,6 +14,7 @@ public class MovieBoundary {
     private String language;
     private int length;
     private Set<String> directors;
+    private String organization;
 
     public MovieBoundary() {
         this.genres = new HashSet<>();
@@ -75,4 +76,15 @@ public class MovieBoundary {
     public void setDirectors(Set<String> directors) {
         this.directors = directors;
     }
+
+    public String getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
+
+
+
 }

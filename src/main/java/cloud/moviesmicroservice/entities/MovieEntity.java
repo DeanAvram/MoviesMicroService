@@ -5,7 +5,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Year;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +19,7 @@ public class MovieEntity {
     private String language;
     private int length;
     private Set<String> directors;
+    private String organization;
 
     public MovieEntity() {
         this.genres = new HashSet<>();
@@ -85,5 +85,13 @@ public class MovieEntity {
 
     public void setDirectors(Set<String> directors) {
         this.directors = directors;
+    }
+
+    public String getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(String organization) {
+        this.organization = organization;
     }
 }

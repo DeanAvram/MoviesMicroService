@@ -73,6 +73,8 @@ public class MoviesServiceImplantation implements MoviesService {
                     movieEntity.setLength(movie.getLength());
                     if (movie.getDirectors() != null)
                         movieEntity.setDirectors(movie.getDirectors());
+                    if (movie.getOrganization() != null)
+                        movieEntity.setOrganization(movie.getOrganization());
                     return this.movies.save(movieEntity);
                 })
                 .then();
@@ -100,6 +102,7 @@ public class MoviesServiceImplantation implements MoviesService {
         rv.setLanguage(movieEntity.getLanguage());
         rv.setLength(movieEntity.getLength());
         rv.setDirectors(movieEntity.getDirectors());
+        rv.setOrganization(movieEntity.getOrganization());
 
         return rv;
     }
@@ -118,6 +121,7 @@ public class MoviesServiceImplantation implements MoviesService {
         rv.setLanguage(movieBoundary.getLanguage());
         rv.setLength(movieBoundary.getLength());
         rv.setDirectors(movieBoundary.getDirectors());
+        rv.setOrganization(movieBoundary.getOrganization());
 
         return rv;
     }

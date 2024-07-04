@@ -4,7 +4,6 @@ import cloud.moviesmicroservice.boundaries.MovieBoundary;
 import cloud.moviesmicroservice.entities.MovieEntity;
 import cloud.moviesmicroservice.exception.BadRequestException;
 import org.springframework.stereotype.Service;
-import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -72,8 +71,8 @@ public class MoviesServiceImplantation implements MoviesService {
                     if (movie.getLanguage() != null)
                         movieEntity.setLanguage(movie.getLanguage());
                     movieEntity.setLength(movie.getLength());
-                    if (movie.getDirector() != null)
-                        movieEntity.setDirector(movie.getDirector());
+                    if (movie.getDirectors() != null)
+                        movieEntity.setDirectors(movie.getDirectors());
                     return this.movies.save(movieEntity);
                 })
                 .then();
@@ -100,7 +99,7 @@ public class MoviesServiceImplantation implements MoviesService {
         rv.setGenres(movieEntity.getGenres());
         rv.setLanguage(movieEntity.getLanguage());
         rv.setLength(movieEntity.getLength());
-        rv.setDirector(movieEntity.getDirector());
+        rv.setDirectors(movieEntity.getDirectors());
 
         return rv;
     }
@@ -118,7 +117,7 @@ public class MoviesServiceImplantation implements MoviesService {
         rv.setGenres(movieBoundary.getGenres());
         rv.setLanguage(movieBoundary.getLanguage());
         rv.setLength(movieBoundary.getLength());
-        rv.setDirector(movieBoundary.getDirector());
+        rv.setDirectors(movieBoundary.getDirectors());
 
         return rv;
     }

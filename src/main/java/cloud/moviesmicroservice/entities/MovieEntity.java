@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Year;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Document(collection = "MOVIES")
@@ -18,9 +19,11 @@ public class MovieEntity {
     private Set<String> genres;
     private String language;
     private int length;
-    private String director;
+    private Set<String> directors;
 
     public MovieEntity() {
+        this.genres = new HashSet<>();
+        this.directors = new HashSet<>();
     }
 
     public String getId() {
@@ -76,11 +79,11 @@ public class MovieEntity {
         this.length = length;
     }
 
-    public String getDirector() {
-        return director;
+    public Set<String> getDirectors() {
+        return directors;
     }
 
-    public void setDirector(String director) {
-        this.director = director;
+    public void setDirectors(Set<String> directors) {
+        this.directors = directors;
     }
 }

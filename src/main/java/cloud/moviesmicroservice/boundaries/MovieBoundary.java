@@ -2,6 +2,7 @@ package cloud.moviesmicroservice.boundaries;
 
 import org.springframework.data.annotation.Id;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class MovieBoundary {
@@ -12,9 +13,11 @@ public class MovieBoundary {
     private Set<String> genres;
     private String language;
     private int length;
-    private String director;
+    private Set<String> directors;
 
     public MovieBoundary() {
+        this.genres = new HashSet<>();
+        this.directors = new  HashSet<>();
     }
 
     public String getId() {
@@ -65,11 +68,11 @@ public class MovieBoundary {
         this.length = length;
     }
 
-    public String getDirector() {
-        return director;
+    public Set<String> getDirectors() {
+        return directors;
     }
 
-    public void setDirector(String director) {
-        this.director = director;
+    public void setDirectors(Set<String> directors) {
+        this.directors = directors;
     }
 }

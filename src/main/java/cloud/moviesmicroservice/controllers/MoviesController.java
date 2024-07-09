@@ -44,15 +44,16 @@ public class MoviesController {
             path = "/{movieId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     )
-    public Mono<Void> updateMovie(@PathVariable(name = "movieId") String movieId, @RequestParam(name = "email") String email, @RequestBody MovieBoundary movie) {
-        return moviesService.updateMovie(movieId, email, movie);
+    public Mono<Void> updateMovie(@PathVariable(name = "movieId") String movieId, @RequestParam(name = "email") String email, @RequestParam(name = "password") String password,
+                                  @RequestBody MovieBoundary movie) {
+        return moviesService.updateMovie(movieId, email, password, movie);
     }
 
     @DeleteMapping(
             path = "/{movieId}"
     )
-    public Mono<Void> deleteMovie(@PathVariable(name = "movieId") String movieId, @RequestParam(name = "email") String email) {
-        return moviesService.deleteMovie(movieId, email);
+    public Mono<Void> deleteMovie(@PathVariable(name = "movieId") String movieId, @RequestParam(name = "email") String email,  @RequestParam(name = "password") String password) {
+        return moviesService.deleteMovie(movieId, email, password);
     }
 
     @DeleteMapping

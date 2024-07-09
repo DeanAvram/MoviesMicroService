@@ -3,14 +3,27 @@ package cloud.moviesmicroservice.services;
 import cloud.moviesmicroservice.boundaries.MovieBoundary;
 import cloud.moviesmicroservice.entities.MovieEntity;
 import cloud.moviesmicroservice.exception.BadRequestException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.regex.Pattern;
 
 @Service
 public class MoviesServiceImplantation implements MoviesService {
 
     private MoviesCrud movies;
+    private WebClient usersWebClient;
+
+    @Value("${remote.users.service.url: http://localhost:8080/users}")
+    public void setUsersWebClientWebClient(String remoteServiceUrl){
+        //System.err.println("%%%" + remoteServiceUrl);
+        this.usersWebClient = WebClient.create(remoteServiceUrl);
+    }
+
 
     public MoviesServiceImplantation(MoviesCrud movies) {
         this.movies = movies;
@@ -60,8 +73,9 @@ public class MoviesServiceImplantation implements MoviesService {
     }
 
     @Override
-    public Mono<Void> updateMovie(String id, String email, MovieBoundary movie) {
-        return this.movies.findById(id)
+    public Mono<Void> updateMovie(String id, String email, String password, MovieBoundary movie) {
+        return isMovieExists(email, password)
+                .then(this.movies.findById(id))
                 .flatMap(movieEntity -> {
                     if (movie.getTitle() != null)
                         movieEntity.setTitle(movie.getTitle());
@@ -82,8 +96,9 @@ public class MoviesServiceImplantation implements MoviesService {
     }
 
     @Override
-    public Mono<Void> deleteMovie(String id, String email) {
-        return this.movies.findById(id)
+    public Mono<Void> deleteMovie(String id, String email, String password) {
+        return isMovieExists(email, password)
+                .then(this.movies.findById(id))
                 .flatMap(movies::delete)
                 .then();
     }
@@ -125,6 +140,26 @@ public class MoviesServiceImplantation implements MoviesService {
         rv.setOrganization(movieBoundary.getOrganization());
 
         return rv;
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}(\\.[A-Za-z]{2,})?$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return email != null && pattern.matcher(email).matches();
+    }
+
+    private Mono<Boolean> isMovieExists(String email, String password) {
+        if (!isValidEmail(email))
+            return Mono.error(new BadRequestException("Invalid email format."));
+        return this.usersWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/{email}")
+                        .queryParam("password", password)
+                        .build(email))
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new BadRequestException("Can not find or authenticate user: " + email) ))
+                .toBodilessEntity()
+                .map(response -> response.getStatusCode().is2xxSuccessful());
     }
 
 
